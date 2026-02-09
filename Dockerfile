@@ -1,14 +1,21 @@
-# clean base image containing only comfyui, comfy-cli and comfyui-manager
+# Usa a imagem base limpa do RunPod
 FROM runpod/worker-comfyui:5.5.1-base
 
-# install custom nodes into comfyui (first node with --mode remote to fetch updated cache)
-# No registry-verified custom nodes found in the workflow.
-# Could not resolve unknown_registry node: MarkdownNote (no aux_id / GitHub repo provided) - skipping installation.
+# Cria as pastas necessárias para garantir que não dê erro de "diretório não encontrado"
+RUN mkdir -p /comfyui/models/diffusion_models
+RUN mkdir -p /comfyui/models/text_encoders
+RUN mkdir -p /comfyui/models/vae
 
-# download models into comfyui
-RUN comfy model download --url https://huggingface.co/Comfy-Org/z_image_turbo/blob/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors --relative-path models/diffusion_models --filename z_image_turbo_bf16.safetensors
-RUN comfy model download --url https://huggingface.co/Comfy-Org/z_image_turbo/blob/main/split_files/text_encoders/qwen_3_4b.safetensors --relative-path models/text_encoders --filename qwen_3_4b.safetensors
-RUN comfy model download --url https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors --relative-path models/vae --filename ae.safetensors
+# --- DOWNLOAD DOS MODELOS (CORRIGIDOS) ---
+# Usamos 'wget' e links 'resolve' para garantir que baixamos o arquivo real, não o site HTML.
 
-# copy all input data (like images or videos) into comfyui (uncomment and adjust if needed)
-# COPY input/ /comfyui/input/
+# 1. Diffusion Model (Corrigido de blob -> resolve)
+RUN wget -O /comfyui/models/diffusion_models/z_image_turbo_bf16.safetensors "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors"
+
+# 2. Text Encoder (Corrigido de blob -> resolve)
+RUN wget -O /comfyui/models/text_encoders/qwen_3_4b.safetensors "https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors"
+
+# 3. VAE (Flux Schnell)
+RUN wget -O /comfyui/models/vae/ae.safetensors "https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors"
+
+# A imagem base já cuida da inicialização, não precisa de CMD extra.
