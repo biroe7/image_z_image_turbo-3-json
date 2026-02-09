@@ -1,5 +1,5 @@
 # Usa a imagem base limpa do RunPod
-FROM runpod/worker-comfyui:latest
+FROM runpod/worker-comfyui:5.7.1-base
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
